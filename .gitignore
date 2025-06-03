@@ -1,0 +1,7 @@
+.env
+Jb_accessKeys.csv
+__pycache__/
+# Ignore Python cache files
+*.py[cod]
+work/
+.nextflow*
