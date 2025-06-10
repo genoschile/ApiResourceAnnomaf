@@ -7,8 +7,6 @@
 
 IMAGE_NAME="aws-translate"
 
-IMAGE_NAME="aws-translate" 
-
 error_exit() {
     echo "Error: $1"
     exit 1

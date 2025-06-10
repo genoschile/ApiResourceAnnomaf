@@ -8,3 +8,7 @@ process sayHello {
     echo 'Hello World from Nextflow!'
     """
 }
+
+/*
+voy a generar un output file format pdf /async
+*/
