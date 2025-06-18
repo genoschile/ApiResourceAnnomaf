@@ -1,11 +1,13 @@
 """
 # This module defines the Celery task for executing Nextflow scripts.
 """
+
 import subprocess
 import json
 import os
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from task import run_nextflow
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -13,15 +15,22 @@ from dotenv import load_dotenv
 app = FastAPI()
 
 load_dotenv()
+# Agrega esto antes de definir tus rutas
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # o ["http://localhost:3000"] si quieres ser más estricto
+    allow_credentials=True,
+    allow_methods=["*"],  # permite OPTIONS, POST, GET, etc.
+    allow_headers=["*"],
+)
+from fastapi import Request
 
 @app.post("/run")
-def run_job():
-    """
-    Endpoint to trigger the Nextflow job asynchronously.
-    """
+async def run_job(request: Request):
+    body = await request.json()
+    print("Payload recibido:", body)
     task = run_nextflow.delay()
     return {"task_id": task.id}
-
 
 class TranslationRequest(BaseModel):
     """

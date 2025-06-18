@@ -11,6 +11,8 @@ def run_nextflow():
     """
     Executes a Nextflow script using subprocess.
     """
+    # espacio ram
+
     try:
         result = subprocess.run(
             ["nextflow", "run", "nf_script.nf"],
@@ -23,3 +25,5 @@ def run_nextflow():
         return f"Nextflow failed:\n{e.stderr}"
     except OSError as e:
         return f"Execution failed (possibly command not found or permission issue):\n{str(e)}"
+
+# saber cuando termino, y si termino 
