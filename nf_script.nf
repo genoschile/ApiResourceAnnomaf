@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 // Define a parameter for the delay time (defaulting to 90 seconds)
-params.delay_seconds = 90
+params.delay_seconds = 20
 // Define the name of the existing PDF file
 params.pdf_source_name = "MAF_translate.pdf"
 

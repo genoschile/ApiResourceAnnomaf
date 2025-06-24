@@ -6,24 +6,55 @@ import subprocess
 import json
 import os
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from task import run_nextflow
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from celery.result import AsyncResult
+from fastapi import Request
+from celery_worker import celery_app
+import asyncio
 
 app = FastAPI()
 
 load_dotenv()
-# Agrega esto antes de definir tus rutas
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # o ["http://localhost:3000"] si quieres ser más estricto
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  # permite OPTIONS, POST, GET, etc.
+    allow_methods=["*"],  
     allow_headers=["*"],
 )
-from fastapi import Request
+
+status_mapping = {
+    "PENDING": "pending",
+    "STARTED": "running",
+    "RECEIVED": "running",
+    "RETRY": "running",
+    "SUCCESS": "done",
+    "FAILURE": "fail",
+    "REVOKED": "fail",
+}
+
+@app.websocket("/ws/status/{task_id}")
+async def websocket_status(websocket: WebSocket, task_id: str):
+    await websocket.accept()
+
+    while True:
+        result = AsyncResult(task_id, app=celery_app)
+        celery_state = result.state
+        mapped_state = status_mapping.get(celery_state, "pending")
+
+        await websocket.send_json({"state": mapped_state})
+
+        if celery_state in ("SUCCESS", "FAILURE", "REVOKED"):
+            break
+
+        await asyncio.sleep(2)
+
+    await websocket.close()
 
 @app.post("/run")
 async def run_job(request: Request):
@@ -78,7 +109,7 @@ def read_root():
     """
     Root endpoint to check if the server is running.
     """
-    return {"message": "Server running!"}
+    return {"message": "Server running! jeje"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
