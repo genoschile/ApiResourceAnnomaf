@@ -20,6 +20,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 RUN wget -qO- https://get.nextflow.io | bash && \
     mv nextflow /usr/local/bin/ && \
     chmod +x /usr/local/bin/nextflow
+    
 # soporte completo para WebSocket
 RUN pip install "uvicorn[standard]"
 RUN pip install --no-cache-dir --upgrade pip && \

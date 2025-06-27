@@ -8,7 +8,7 @@ params.pdf_source_name = "MAF_translate.pdf"
 // --- Simulate a delay ---
 process simulateDelay {
     output:
-        path "delay_completed.txt" // An output file to signal completion
+    path "delay_completed.txt"
 
     script:
     """
@@ -21,9 +21,10 @@ process simulateDelay {
 // --- Copy the existing PDF ---
 process copyExistingPdf {
     input:
-        path delay_signal // This process waits for simulateDelay to finish
+    path delay_signal
+
     output:
-        path "${params.pdf_source_name}" // Output the existing PDF with its original name
+    path "${params.pdf_source_name}"
 
     script:
     """
@@ -39,7 +40,7 @@ process copyExistingPdf {
 workflow {
     // Check if the source PDF file exists before starting the workflow
     if (!file(params.pdf_source_name).exists()) {
-        error "Error: The PDF file '${params.pdf_source_name}' was not found in the project root directory '${baseDir}'."
+        error("Error: The PDF file '${params.pdf_source_name}' was not found in the project root directory '${baseDir}'.")
     }
 
     // Run the delay simulation
@@ -49,5 +50,5 @@ workflow {
     // This ensures the copy operation only runs after the delay is complete
     copyExistingPdf(delay_output)
 
-    log.info "Workflow started. The existing PDF '${params.pdf_source_name}' will be copied after a ${params.delay_seconds} second delay."
+    log.info("Workflow started. The existing PDF '${params.pdf_source_name}' will be copied after a ${params.delay_seconds} second delay.")
 }
